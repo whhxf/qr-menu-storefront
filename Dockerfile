@@ -11,12 +11,13 @@ RUN npm install --omit=dev
 
 COPY . .
 
+# /data is the named volume mount (see docker-compose.yml). Do not move SQLite back into /app.
 ENV NODE_ENV=production \
     PORT=3000 \
     DATA_DIR=/data \
     ADMIN_PASSWORD=changeme
 
-RUN mkdir -p /data
+RUN mkdir -p /data /data/uploads
 
 EXPOSE 3000
 

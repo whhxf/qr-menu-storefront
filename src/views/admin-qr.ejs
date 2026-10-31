@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Table card · <%= shop.name %></title>
+  <link rel="stylesheet" href="/static/css/admin.css" />
+</head>
+<body>
+  <header class="admin-bar no-print">
+    <div class="admin-title">
+      <strong><%= shop.name %></strong>
+      <span class="muted">table card</span>
+    </div>
+    <div class="bar-actions">
+      <a href="/admin">Editor</a>
+      <a href="/" target="_blank">View menu</a>
+    </div>
+  </header>
+
+  <main class="panel">
+    <p class="hint no-print">Print this once and put it on the table. The QR opens the live menu. Change a price, an allergen, or a sold-out item from your phone later — do not reprint the card for that.</p>
+    <div class="qr-actions no-print">
+      <button type="button" onclick="window.print()">Print card</button>
+      <a class="button-link" href="/admin/qr.png?download=1">Download QR PNG</a>
+      <button type="button" class="ghost" id="copy-url">Copy menu link</button>
+    </div>
+
+    <article class="desk-card">
+      <p class="desk-kicker">Today’s menu</p>
+      <h1><%= shop.name %></h1>
+      <% if (shop.name_alt) { %><p class="desk-alt"><%= shop.name_alt %></p><% } %>
+      <img src="/admin/qr.png" alt="QR code that opens the menu" width="320" height="320" />
+      <p class="desk-scan">Scan for today’s menu</p>
+      <p class="desk-note">No app. Menu only — not a checkout.</p>
+      <p class="desk-url" id="menu-url"><%= menuUrl %></p>
+    </article>
+  </main>
+  <script>
+    document.getElementById('copy-url').addEventListener('click', function () {
+      var url = document.getElementById('menu-url').textContent.trim();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url);
+      }
+    });
+  </script>
+</body>
+</html>

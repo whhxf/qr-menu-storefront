@@ -3,9 +3,13 @@ const fs = require('fs');
 const Database = require('better-sqlite3');
 
 const dataDir = process.env.DATA_DIR || path.join(__dirname, '..', 'data');
-fs.mkdirSync(dataDir, { recursive: true });
+const resolvedDataDir = path.resolve(dataDir);
+fs.mkdirSync(resolvedDataDir, { recursive: true });
 
-const dbPath = path.join(dataDir, 'shopfront.db');
+const uploadDir = path.join(resolvedDataDir, 'uploads');
+fs.mkdirSync(uploadDir, { recursive: true });
+
+const dbPath = path.join(resolvedDataDir, 'shopfront.db');
 const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
@@ -59,8 +63,28 @@ function migrate() {
       visible INTEGER DEFAULT 1
     );
   `);
+
+  const adminCols = db.prepare('PRAGMA table_info(admin)').all();
+  if (!adminCols.some((col) => col.name === 'must_change_password')) {
+    db.exec(
+      'ALTER TABLE admin ADD COLUMN must_change_password INTEGER NOT NULL DEFAULT 0'
+    );
+  }
 }
 
 migrate();
+
+const appRoot = path.resolve(__dirname, '..');
+const insideApp =
+  resolvedDataDir === appRoot || resolvedDataDir.startsWith(appRoot + path.sep);
+
+console.log(`Shopfront SQLite: ${dbPath}`);
+if (insideApp) {
+  console.warn(
+    'Shopfront: DATA_DIR is inside the app directory. A redeploy that replaces this directory will delete the menu and uploaded photos. Hostinger Node Web Apps do that. See docs/DEPLOY.md.'
+  );
+}
+
+db.shopfront = { dataDir: resolvedDataDir, dbPath, uploadDir };
 
 module.exports = db;

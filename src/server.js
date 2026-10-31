@@ -13,12 +13,18 @@ if (shopCount === 0) {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.disable('x-powered-by');
+app.set('trust proxy', 1);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/static', express.static(path.join(__dirname, 'public')));
+app.use('/uploads', (req, res, next) => {
+  res.set('X-Content-Type-Options', 'nosniff');
+  next();
+}, express.static(db.shopfront.uploadDir, { index: false, maxAge: '7d' }));
 
 app.locals.parseJson = (s, fallback = []) => {
   try {
