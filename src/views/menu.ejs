@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<%= lang === 'alt' ? 'zh' : 'en' %>">
+<html lang="<%= lang === 'alt' ? (shop.secondary_lang || 'zh') : 'en' %>">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -11,11 +11,11 @@
   <header class="hero">
     <div class="hero-top">
       <div>
-        <p class="eyebrow">QR storefront · display only</p>
+        <p class="eyebrow"><%= ui.eyebrow %></p>
         <h1><%= lang === 'alt' && shop.name_alt ? shop.name_alt : shop.name %></h1>
         <p class="tagline"><%= lang === 'alt' && shop.tagline_alt ? shop.tagline_alt : shop.tagline %></p>
       </div>
-      <a class="lang-toggle" href="?<%= lang === 'alt' ? '' : 'lang=alt' %><%= filters.exclude.map(a => '&exclude='+a).join('') %><%= filters.diet.map(d => '&diet='+d).join('') %><%= filters.specialsOnly ? '&specials=1' : '' %>">
+      <a class="lang-toggle" href="?<%= lang === 'alt' ? '' : 'lang=alt' %><%= filters.exclude.map(a => '&exclude='+encodeURIComponent(a)).join('') %><%= filters.diet.map(d => '&diet='+encodeURIComponent(d)).join('') %><%= filters.specialsOnly ? '&specials=1' : '' %>">
         <%= lang === 'alt' ? 'English' : (shop.secondary_lang_label || '中文') %>
       </a>
     </div>
@@ -35,31 +35,33 @@
     </div>
   </header>
 
-  <details class="filters">
-    <summary>Filter allergens & diet<%= filters.exclude.length || filters.diet.length || filters.specialsOnly ? ' · active' : '' %></summary>
+  <details class="filters" <%= filters.exclude.length || filters.diet.length || filters.specialsOnly ? 'open' : '' %>>
+    <summary><%= ui.filters %><%= filters.exclude.length || filters.diet.length || filters.specialsOnly ? ' · ' + ui.active : '' %></summary>
     <form method="get" class="filter-form">
       <% if (lang === 'alt') { %><input type="hidden" name="lang" value="alt" /><% } %>
-      <label class="chip"><input type="checkbox" name="specials" value="1" <%= filters.specialsOnly ? 'checked' : '' %> /> Today's specials</label>
+      <label class="chip"><input type="checkbox" name="specials" value="1" <%= filters.specialsOnly ? 'checked' : '' %> /> <%= ui.specials %></label>
       <fieldset>
-        <legend>Hide if contains</legend>
-        <% allergens.forEach(a => { %>
-          <label class="chip"><input type="checkbox" name="exclude" value="<%= a %>" <%= filters.exclude.includes(a) ? 'checked' : '' %> /> <%= a %></label>
+        <legend><%= ui.hide %></legend>
+        <% allergenOptions.forEach(a => { %>
+          <label class="chip"><input type="checkbox" name="exclude" value="<%= a.id %>" <%= filters.exclude.includes(a.id) ? 'checked' : '' %> /> <%= a.label %></label>
         <% }) %>
       </fieldset>
       <fieldset>
-        <legend>Must be</legend>
+        <legend><%= ui.must %></legend>
         <% dietOptions.forEach(d => { %>
-          <label class="chip"><input type="checkbox" name="diet" value="<%= d %>" <%= filters.diet.includes(d) ? 'checked' : '' %> /> <%= d %></label>
+          <label class="chip"><input type="checkbox" name="diet" value="<%= d.id %>" <%= filters.diet.includes(d.id) ? 'checked' : '' %> /> <%= d.label %></label>
         <% }) %>
       </fieldset>
-      <button type="submit">Apply filters</button>
-      <a class="clear" href="<%= lang === 'alt' ? '?lang=alt' : '/' %>">Clear</a>
+      <div class="filter-actions">
+        <button type="submit"><%= ui.apply %></button>
+        <a class="clear" href="<%= lang === 'alt' ? '?lang=alt' : '/' %>"><%= ui.clear %></a>
+      </div>
     </form>
   </details>
 
   <main>
     <% if (!menu.length) { %>
-      <p class="empty">No items match these filters.</p>
+      <p class="empty"><%= ui.empty %></p>
     <% } %>
     <% menu.forEach(cat => { %>
       <section class="category">
@@ -67,20 +69,25 @@
         <ul class="items">
           <% cat.items.forEach(it => { %>
             <li class="item <%= it.sold_out ? 'sold-out' : '' %> <%= it.is_special ? 'special' : '' %>">
-              <div class="item-main">
-                <div class="item-title">
-                  <h3><%= lang === 'alt' && it.name_alt ? it.name_alt : it.name %></h3>
-                  <% if (it.is_special) { %><span class="badge special-badge">Special</span><% } %>
-                  <% if (it.sold_out) { %><span class="badge sold-badge">Sold out</span><% } %>
+              <% if (it.image_url) { %>
+                <img class="item-thumb" src="<%= it.image_url %>" alt="<%= lang === 'alt' && it.name_alt ? it.name_alt : it.name %>" width="76" height="76" loading="lazy" onerror="this.hidden=true" />
+              <% } %>
+              <div class="item-body">
+                <div class="item-main">
+                  <div class="item-title">
+                    <h3><%= lang === 'alt' && it.name_alt ? it.name_alt : it.name %></h3>
+                    <% if (it.is_special) { %><span class="badge special-badge"><%= ui.special %></span><% } %>
+                    <% if (it.sold_out) { %><span class="badge sold-badge"><%= ui.sold %></span><% } %>
+                  </div>
+                  <% const idesc = lang === 'alt' && it.description_alt ? it.description_alt : it.description; %>
+                  <% if (idesc) { %><p class="item-desc"><%= idesc %></p><% } %>
+                  <div class="tags">
+                    <% it.diet_tags.forEach(t => { %><span class="tag diet"><%= labelMap[t] || t %></span><% }) %>
+                    <% it.allergens.forEach(t => { %><span class="tag allergen"><%= labelMap[t] || t %></span><% }) %>
+                  </div>
                 </div>
-                <% const idesc = lang === 'alt' && it.description_alt ? it.description_alt : it.description; %>
-                <% if (idesc) { %><p class="item-desc"><%= idesc %></p><% } %>
-                <div class="tags">
-                  <% it.diet_tags.forEach(t => { %><span class="tag diet"><%= t %></span><% }) %>
-                  <% it.allergens.forEach(t => { %><span class="tag allergen"><%= t %></span><% }) %>
-                </div>
+                <div class="price"><%= shop.currency %><%= Number(it.price).toFixed(2) %></div>
               </div>
-              <div class="price"><%= shop.currency %><%= Number(it.price).toFixed(2) %></div>
             </li>
           <% }) %>
         </ul>
@@ -89,8 +96,8 @@
   </main>
 
   <footer class="foot">
-    <p>Display-only menu. No ordering or payment here — ask staff or tap WhatsApp.</p>
-    <p class="powered">Self-hosted Shopfront · <a href="/admin/login">Staff</a></p>
+    <p><%= ui.foot %></p>
+    <p class="powered">Shopfront · <a href="/admin/login"><%= ui.staff %></a></p>
   </footer>
 </body>
 </html>

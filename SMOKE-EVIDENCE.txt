@@ -1,16 +1,24 @@
 {"ok":true}
 
-Shopfront smoke tests @ http://127.0.0.1:3000
-  [PASS] GET / public menu — 200
+Shopfront smoke tests @ http://127.0.0.1:3456
+  [PASS] GET / public menu + images — 200
+  [PASS] GET /?lang=alt bilingual chrome — 200
   [PASS] GET /health — {"ok":true}
   [PASS] GET /api/menu — 5 categories
-  [PASS] GET /?exclude=dairy — 200
-  [PASS] POST /admin/login — cookie set
+  [PASS] GET /?exclude=dairy — Flat White hidden
+  [PASS] POST /admin/login default password — gated
+  [PASS] Password gate blocks editor — password_change_required
+  [PASS] Reject password changeme — 400
+  [PASS] POST /admin/password — default replaced
   [PASS] GET /admin — 200
-  [PASS] POST toggle sold-out — id=1 -> 1
-  [PASS] POST toggle sold-out restore — id=1 -> 0
+  [PASS] POST without CSRF — 403
+  [PASS] POST toggle sold-out — id=1
   [PASS] POST price update — 5.5 -> 5.51 -> restored
+  [PASS] Guest renders image_url — https://images.example.com/yuzu-cold-brew.jpg
+  [PASS] POST dish photo upload — /uploads/1793450881942-b7c90f369ba691aa.png
+  [PASS] GET /admin/qr desk card + PNG — 3936 bytes
+  [PASS] Secure cookie on HTTPS — Secure
   [PASS] No cart/checkout/pay/order — 404
+  [PASS] Login rate limit — 429 after 8 failures
 
-All 10 checks passed.
-
+All 19 checks passed.

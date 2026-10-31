@@ -2,8 +2,9 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const db = require('./db');
 
-const password = process.env.ADMIN_PASSWORD || 'changeme';
+const password = (process.env.ADMIN_PASSWORD || 'changeme').trim() || 'changeme';
 const hash = bcrypt.hashSync(password, 10);
+const mustChange = password.toLowerCase() === 'changeme' ? 1 : 0;
 
 db.exec('DELETE FROM items; DELETE FROM categories; DELETE FROM shop; DELETE FROM admin;');
 
@@ -26,7 +27,7 @@ db.prepare(`
   '$'
 );
 
-db.prepare('INSERT INTO admin (id, password_hash) VALUES (1, ?)').run(hash);
+db.prepare('INSERT INTO admin (id, password_hash, must_change_password) VALUES (1, ?, ?)').run(hash, mustChange);
 
 const cats = [
   { name: "Today's Specials", name_alt: '今日特选', sort: 0 },
@@ -237,6 +238,26 @@ const items = [
   },
 ];
 
+const DRINK = '/static/img/drink.svg';
+const PASTRY = '/static/img/pastry.svg';
+const BITE = '/static/img/bite.svg';
+const imageFor = {
+  'Yuzu Cold Brew': DRINK,
+  Espresso: DRINK,
+  'Flat White': DRINK,
+  'Oat Latte': DRINK,
+  'Matcha Latte': DRINK,
+  'Jasmine Green Tea': DRINK,
+  'Fresh Orange Juice': DRINK,
+  'Miso Butter Croissant': PASTRY,
+  'Almond Croissant': PASTRY,
+  'Banana Bread Slice': PASTRY,
+  'Vegan Brownie': PASTRY,
+  'Avocado Toast': BITE,
+  'Granola Bowl': BITE,
+  'Ham & Cheese Toastie': BITE,
+};
+
 for (const it of items) {
   insertItem.run(
     catIds[it.cat],
@@ -245,7 +266,7 @@ for (const it of items) {
     it.description,
     it.description_alt,
     it.price,
-    '',
+    imageFor[it.name] || '',
     JSON.stringify(it.allergens),
     JSON.stringify(it.diet),
     it.sold_out,
@@ -255,5 +276,8 @@ for (const it of items) {
 }
 
 console.log('Seeded Harbor Roast Café demo data.');
-console.log('Admin password:', password);
-console.log('(Set ADMIN_PASSWORD env to change before seeding.)');
+if (mustChange) {
+  console.log('Admin password is the default. The first staff login must change it.');
+} else {
+  console.log('Admin password set from ADMIN_PASSWORD.');
+}

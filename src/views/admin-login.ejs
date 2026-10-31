@@ -8,8 +8,10 @@
 </head>
 <body class="login-body">
   <form class="login-card" method="post" action="/admin/login">
+    <input type="hidden" name="_csrf" value="<%= csrf %>" />
+    <p class="eyebrow">Shopfront</p>
     <h1>Staff login</h1>
-    <p>Mobile-friendly admin for prices & sold-out.</p>
+    <p>Update today’s menu from your phone. This is the menu editor, not a register.</p>
     <% if (error) { %><p class="error"><%= error %></p><% } %>
     <label>Password
       <input type="password" name="password" required autofocus autocomplete="current-password" />

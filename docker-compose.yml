@@ -1,9 +1,10 @@
-# One container. SQLite lives in the shopfront_data volume.
+# One container. SQLite and uploaded dish photos live in the shopfront_data volume.
 #   docker compose up -d --build
+# `docker compose down` keeps the volume. `docker compose down -v` deletes the menu.
 services:
   shopfront:
     build: .
-    image: shopfront-mvp:latest
+    image: shopfront:latest
     container_name: shopfront
     restart: unless-stopped
     ports:
@@ -11,8 +12,9 @@ services:
     environment:
       PORT: "3000"
       DATA_DIR: /data
-      # Change this after first login via Admin → Password
+      # changeme cannot open the editor until it is replaced on first login.
       ADMIN_PASSWORD: "${ADMIN_PASSWORD:-changeme}"
+      # PUBLIC_BASE_URL: "https://menu.example.com"
     volumes:
       - shopfront_data:/data
 
