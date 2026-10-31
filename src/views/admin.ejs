@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin · <%= shop.name %></title>
+  <link rel="stylesheet" href="/static/css/admin.css" />
+</head>
+<body>
+  <header class="admin-bar">
+    <div>
+      <strong><%= shop.name %></strong>
+      <span class="muted">admin</span>
+    </div>
+    <div class="bar-actions">
+      <a href="/" target="_blank">View menu</a>
+      <form method="post" action="/admin/logout"><button type="submit" class="linkish">Logout</button></form>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <a href="#items">Items</a>
+    <a href="#shop">Shop & CTAs</a>
+    <a href="#categories">Categories</a>
+    <a href="#add">Add item</a>
+    <a href="#password">Password</a>
+  </nav>
+
+  <section id="items" class="panel">
+    <h2>Quick edit</h2>
+    <p class="hint">Tap sold-out / special. Change price and save.</p>
+    <ul class="admin-items">
+      <% items.forEach(it => { %>
+        <li class="admin-item <%= it.sold_out ? 'is-sold' : '' %>">
+          <div class="row">
+            <div>
+              <strong><%= it.name %></strong>
+              <span class="muted"><%= it.category_name %></span>
+            </div>
+            <div class="quick">
+              <form method="post" action="/admin/items/<%= it.id %>/toggle-sold-out">
+                <button type="submit" class="<%= it.sold_out ? 'warn' : '' %>"><%= it.sold_out ? 'Sold out' : 'Mark sold out' %></button>
+              </form>
+              <form method="post" action="/admin/items/<%= it.id %>/toggle-special">
+                <button type="submit" class="<%= it.is_special ? 'accent' : 'ghost' %>"><%= it.is_special ? '★ Special' : 'Special' %></button>
+              </form>
+            </div>
+          </div>
+          <form method="post" action="/admin/items/<%= it.id %>/price" class="price-row">
+            <label>Price
+              <input type="number" step="0.01" min="0" name="price" value="<%= it.price %>" />
+            </label>
+            <button type="submit">Save price</button>
+          </form>
+          <details>
+            <summary>Edit details</summary>
+            <form method="post" action="/admin/items/<%= it.id %>" class="edit-form">
+              <label>Name EN <input name="name" value="<%= it.name %>" /></label>
+              <label>Name alt <input name="name_alt" value="<%= it.name_alt %>" /></label>
+              <label>Description EN <textarea name="description" rows="2"><%= it.description %></textarea></label>
+              <label>Description alt <textarea name="description_alt" rows="2"><%= it.description_alt %></textarea></label>
+              <label>Image URL <input name="image_url" value="<%= it.image_url %>" placeholder="https://..." /></label>
+              <label>Category
+                <select name="category_id">
+                  <% categories.forEach(c => { %>
+                    <option value="<%= c.id %>" <%= c.id === it.category_id ? 'selected' : '' %>><%= c.name %></option>
+                  <% }) %>
+                </select>
+              </label>
+              <fieldset>
+                <legend>Allergens</legend>
+                <% ['gluten','dairy','egg','nuts','soy','shellfish','fish','sesame'].forEach(a => { %>
+                  <label class="chip"><input type="checkbox" name="allergens" value="<%= a %>" <%= it.allergens.includes(a) ? 'checked' : '' %> /> <%= a %></label>
+                <% }) %>
+              </fieldset>
+              <fieldset>
+                <legend>Diet</legend>
+                <% ['vegan','vegetarian','gluten-free'].forEach(d => { %>
+                  <label class="chip"><input type="checkbox" name="diet_tags" value="<%= d %>" <%= it.diet_tags.includes(d) ? 'checked' : '' %> /> <%= d %></label>
+                <% }) %>
+              </fieldset>
+              <label class="chip"><input type="checkbox" name="sold_out" value="1" <%= it.sold_out ? 'checked' : '' %> /> Sold out</label>
+              <label class="chip"><input type="checkbox" name="is_special" value="1" <%= it.is_special ? 'checked' : '' %> /> Today's special</label>
+              <button type="submit">Save item</button>
+            </form>
+          </details>
+        </li>
+      <% }) %>
+    </ul>
+  </section>
+
+  <section id="shop" class="panel">
+    <h2>Shop & CTA slots</h2>
+    <form method="post" action="/admin/shop" class="edit-form">
+      <label>Name EN <input name="name" value="<%= shop.name %>" required /></label>
+      <label>Name alt <input name="name_alt" value="<%= shop.name_alt %>" /></label>
+      <label>Tagline EN <input name="tagline" value="<%= shop.tagline %>" /></label>
+      <label>Tagline alt <input name="tagline_alt" value="<%= shop.tagline_alt %>" /></label>
+      <label>Description EN <textarea name="description" rows="3"><%= shop.description %></textarea></label>
+      <label>Description alt <textarea name="description_alt" rows="3"><%= shop.description_alt %></textarea></label>
+      <label>Currency symbol <input name="currency" value="<%= shop.currency %>" maxlength="4" /></label>
+      <label>Secondary language label <input name="secondary_lang_label" value="<%= shop.secondary_lang_label %>" /></label>
+      <label>WhatsApp (digits with country code) <input name="whatsapp" value="<%= shop.whatsapp %>" placeholder="15551234567" /></label>
+      <label>Google Maps URL <input name="maps_url" value="<%= shop.maps_url %>" /></label>
+      <label>Instagram URL <input name="instagram" value="<%= shop.instagram %>" /></label>
+      <button type="submit">Save shop</button>
+    </form>
+  </section>
+
+  <section id="categories" class="panel">
+    <h2>Categories</h2>
+    <ul class="simple-list">
+      <% categories.forEach(c => { %>
+        <li><strong><%= c.name %></strong> · <%= c.name_alt || '—' %></li>
+      <% }) %>
+    </ul>
+    <form method="post" action="/admin/categories" class="edit-form inline">
+      <label>New category EN <input name="name" required /></label>
+      <label>Name alt <input name="name_alt" /></label>
+      <button type="submit">Add category</button>
+    </form>
+  </section>
+
+  <section id="add" class="panel">
+    <h2>Add item</h2>
+    <form method="post" action="/admin/items" class="edit-form">
+      <label>Category
+        <select name="category_id" required>
+          <% categories.forEach(c => { %>
+            <option value="<%= c.id %>"><%= c.name %></option>
+          <% }) %>
+        </select>
+      </label>
+      <label>Name EN <input name="name" required /></label>
+      <label>Name alt <input name="name_alt" /></label>
+      <label>Description EN <textarea name="description" rows="2"></textarea></label>
+      <label>Description alt <textarea name="description_alt" rows="2"></textarea></label>
+      <label>Price <input type="number" step="0.01" min="0" name="price" value="0" required /></label>
+      <label>Image URL <input name="image_url" placeholder="https://..." /></label>
+      <button type="submit">Add item</button>
+    </form>
+  </section>
+
+  <section id="password" class="panel">
+    <h2>Change password</h2>
+    <form method="post" action="/admin/password" class="edit-form">
+      <label>New password (min 6) <input type="password" name="password" minlength="6" required /></label>
+      <button type="submit">Update password</button>
+    </form>
+  </section>
+</body>
+</html>

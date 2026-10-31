@@ -1,0 +1,16 @@
+{"ok":true}
+
+Shopfront smoke tests @ http://127.0.0.1:3000
+  [PASS] GET / public menu — 200
+  [PASS] GET /health — {"ok":true}
+  [PASS] GET /api/menu — 5 categories
+  [PASS] GET /?exclude=dairy — 200
+  [PASS] POST /admin/login — cookie set
+  [PASS] GET /admin — 200
+  [PASS] POST toggle sold-out — id=1 -> 1
+  [PASS] POST toggle sold-out restore — id=1 -> 0
+  [PASS] POST price update — 5.5 -> 5.51 -> restored
+  [PASS] No cart/checkout/pay/order — 404
+
+All 10 checks passed.
+

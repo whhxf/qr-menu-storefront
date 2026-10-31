@@ -1,0 +1,30 @@
+{
+  "name": "shopfront-mvp",
+  "version": "1.0.0",
+  "description": "Self-hosted QR digital storefront for cafés and small shops. Display-only — no cart, payment, or kitchen display.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "seed": "node src/seed.js",
+    "smoke": "node scripts/smoke.js"
+  },
+  "keywords": ["qr-menu", "self-hosted", "storefront", "docker", "hostinger"],
+  "author": "Conan",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "better-sqlite3": "^13.0.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.3",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

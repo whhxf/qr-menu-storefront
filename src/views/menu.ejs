@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="<%= lang === 'alt' ? 'zh' : 'en' %>">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title><%= lang === 'alt' && shop.name_alt ? shop.name_alt : shop.name %></title>
+  <meta name="description" content="<%= lang === 'alt' && shop.tagline_alt ? shop.tagline_alt : shop.tagline %>" />
+  <link rel="stylesheet" href="/static/css/menu.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-top">
+      <div>
+        <p class="eyebrow">QR storefront · display only</p>
+        <h1><%= lang === 'alt' && shop.name_alt ? shop.name_alt : shop.name %></h1>
+        <p class="tagline"><%= lang === 'alt' && shop.tagline_alt ? shop.tagline_alt : shop.tagline %></p>
+      </div>
+      <a class="lang-toggle" href="?<%= lang === 'alt' ? '' : 'lang=alt' %><%= filters.exclude.map(a => '&exclude='+a).join('') %><%= filters.diet.map(d => '&diet='+d).join('') %><%= filters.specialsOnly ? '&specials=1' : '' %>">
+        <%= lang === 'alt' ? 'English' : (shop.secondary_lang_label || '中文') %>
+      </a>
+    </div>
+    <% const desc = lang === 'alt' && shop.description_alt ? shop.description_alt : shop.description; %>
+    <% if (desc) { %><p class="desc"><%= desc %></p><% } %>
+
+    <div class="cta-row">
+      <% if (shop.whatsapp) { %>
+        <a class="cta whatsapp" href="https://wa.me/<%= shop.whatsapp.replace(/[^0-9]/g,'') %>" target="_blank" rel="noopener">WhatsApp</a>
+      <% } %>
+      <% if (shop.maps_url) { %>
+        <a class="cta maps" href="<%= shop.maps_url %>" target="_blank" rel="noopener">Maps</a>
+      <% } %>
+      <% if (shop.instagram) { %>
+        <a class="cta ig" href="<%= shop.instagram %>" target="_blank" rel="noopener">Instagram</a>
+      <% } %>
+    </div>
+  </header>
+
+  <details class="filters">
+    <summary>Filter allergens & diet<%= filters.exclude.length || filters.diet.length || filters.specialsOnly ? ' · active' : '' %></summary>
+    <form method="get" class="filter-form">
+      <% if (lang === 'alt') { %><input type="hidden" name="lang" value="alt" /><% } %>
+      <label class="chip"><input type="checkbox" name="specials" value="1" <%= filters.specialsOnly ? 'checked' : '' %> /> Today's specials</label>
+      <fieldset>
+        <legend>Hide if contains</legend>
+        <% allergens.forEach(a => { %>
+          <label class="chip"><input type="checkbox" name="exclude" value="<%= a %>" <%= filters.exclude.includes(a) ? 'checked' : '' %> /> <%= a %></label>
+        <% }) %>
+      </fieldset>
+      <fieldset>
+        <legend>Must be</legend>
+        <% dietOptions.forEach(d => { %>
+          <label class="chip"><input type="checkbox" name="diet" value="<%= d %>" <%= filters.diet.includes(d) ? 'checked' : '' %> /> <%= d %></label>
+        <% }) %>
+      </fieldset>
+      <button type="submit">Apply filters</button>
+      <a class="clear" href="<%= lang === 'alt' ? '?lang=alt' : '/' %>">Clear</a>
+    </form>
+  </details>
+
+  <main>
+    <% if (!menu.length) { %>
+      <p class="empty">No items match these filters.</p>
+    <% } %>
+    <% menu.forEach(cat => { %>
+      <section class="category">
+        <h2><%= lang === 'alt' && cat.name_alt ? cat.name_alt : cat.name %></h2>
+        <ul class="items">
+          <% cat.items.forEach(it => { %>
+            <li class="item <%= it.sold_out ? 'sold-out' : '' %> <%= it.is_special ? 'special' : '' %>">
+              <div class="item-main">
+                <div class="item-title">
+                  <h3><%= lang === 'alt' && it.name_alt ? it.name_alt : it.name %></h3>
+                  <% if (it.is_special) { %><span class="badge special-badge">Special</span><% } %>
+                  <% if (it.sold_out) { %><span class="badge sold-badge">Sold out</span><% } %>
+                </div>
+                <% const idesc = lang === 'alt' && it.description_alt ? it.description_alt : it.description; %>
+                <% if (idesc) { %><p class="item-desc"><%= idesc %></p><% } %>
+                <div class="tags">
+                  <% it.diet_tags.forEach(t => { %><span class="tag diet"><%= t %></span><% }) %>
+                  <% it.allergens.forEach(t => { %><span class="tag allergen"><%= t %></span><% }) %>
+                </div>
+              </div>
+              <div class="price"><%= shop.currency %><%= Number(it.price).toFixed(2) %></div>
+            </li>
+          <% }) %>
+        </ul>
+      </section>
+    <% }) %>
+  </main>
+
+  <footer class="foot">
+    <p>Display-only menu. No ordering or payment here — ask staff or tap WhatsApp.</p>
+    <p class="powered">Self-hosted Shopfront · <a href="/admin/login">Staff</a></p>
+  </footer>
+</body>
+</html>
