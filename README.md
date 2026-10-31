@@ -1,3 +1,7 @@
+> **已止损归档。** 本仓库已归档，只保留代码作参考，不再做功能开发。仅展示、自托管的二维码菜单这个楔子，在需求验证后被否决（约 70% 置信度）。决策日期：2026-10-31。研究草稿在仓库根目录的 [MARKET-VALIDATION.md](MARKET-VALIDATION.md)（不在 `docs/`）。说明见 [docs/ARCHIVED.md](docs/ARCHIVED.md)。
+>
+> **ARCHIVED.** This repo is archived (stop-loss). The display-only self-hosted QR menu wedge was rejected after demand validation (~70% confidence). No further feature development; keep the code as reference only. Decision date: 2026-10-31.
+
 # Shopfront
 
 A café already has a QR sticker on the table. Today that sticker opens a PDF or a paper insert, and the shop reprints it whenever a price, an allergen, a sold-out item, or today’s special changes.
@@ -29,7 +33,9 @@ Cafés and small shops that already send guests to a QR code and are tired of re
 - Multi-tenant hosted accounts
 - WeChat mini-program ordering
 
-## Run locally
+## Run locally (historical reference)
+
+These commands are kept so the old app can still be read and run. They are not a get-started path for a live product.
 
 Node.js 18 or newer.
 
@@ -58,20 +64,23 @@ npm run smoke
 
 Screenshots and a short GIF will live in [`docs/screenshots/`](docs/screenshots/). None are in the repo yet.
 
-## Deploy
+## Deploy (historical reference)
 
-The menu has to live somewhere a redeploy will not erase. Docker Compose with the `shopfront_data` volume is the path that does that. A Node host works when `DATA_DIR` is outside the folder the deploy overwrites. A Hostinger Node Web App overwrites the app directory, so it is fine for a demo and the wrong place for a café menu that must survive the next deploy.
+The notes below record how this app was deployed. They are not a call to deploy it now.
+
+The menu had to live somewhere a redeploy would not erase. Docker Compose with the `shopfront_data` volume was the path that did that. A Node host works when `DATA_DIR` is outside the folder the deploy overwrites. A Hostinger Node Web App overwrites the app directory, so it was fine for a demo and the wrong place for a café menu that must survive the next deploy.
 
 Details, the volume, and the password reset warning: [docs/DEPLOY.md](docs/DEPLOY.md).
 
 Change `ADMIN_PASSWORD` before the QR goes on a table. `changeme` is locked out of the editor on first login.
 
-<!-- TODO: replace YOUR_PARTNER_CODE when Hostinger Open Source Partners leaves the waitlist and emails a code. Submitted 2026-10-31. Not an approved partner. See docs/DEPLOY.md. -->
+<!-- Historical reference only. The old one-click deploy link used ref=YOUR_PARTNER_CODE. Submitted to Hostinger Open Source Partners on 2026-10-31. Not an approved partner. See docs/DEPLOY.md. Do not treat this as a current deploy CTA. -->
 
-[![Deploy on Hostinger](https://assets.hostinger.com/vps/deploy.svg)](https://www.hostinger.com/deploy?template=whhxf/qr-menu-storefront&ref=YOUR_PARTNER_CODE)
+Historical reference only (not a current deploy): [Hostinger deploy template](https://www.hostinger.com/deploy?template=whhxf/qr-menu-storefront&ref=YOUR_PARTNER_CODE)
 
 ## Docs
 
+- [Archived](docs/ARCHIVED.md) — why this repo stopped, and what not to revive
 - [Product brief](docs/PRODUCT.md) — who, the job, non-goals
 - [Requirements](docs/REQUIREMENTS.md) — P0 / P1 with acceptance criteria
 - [Deploy](docs/DEPLOY.md) — Compose, Node, Hostinger Node caveat
