@@ -1,6 +1,5 @@
-# Hostinger Deploy: point compose_url at the raw GitHub URL of this file.
-# Example:
-# https://www.hostinger.com/vps/docker-hostinger?compose_url=https://raw.githubusercontent.com/YOUR_USER/shopfront-mvp/main/docker-compose.yml&ref=YOUR_CODE
+# One container. SQLite lives in the shopfront_data volume.
+#   docker compose up -d --build
 services:
   shopfront:
     build: .
